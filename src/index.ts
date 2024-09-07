@@ -4,6 +4,10 @@ import connectDB from './config/db';
 import { port, appEnv, APP_ORIGIN } from './constants/env';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import catchErrors from "./utils/catchErrors";
+import { HTTP_STATUS } from "./constants/http";
+import authRoutes from "./routes/auth.routes";
+import errorHandler from "./middleware/errorHandler";
 
 const app = express();
 
@@ -14,18 +18,22 @@ app.use(
         origin: APP_ORIGIN,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
     })
 )
 app.use(cookieParser());
 
-app.get('/', (req, res) => {
-    throw new Error('This is a test error');
-    res.status(200).json({
-        success: false,
+app.get('/', 
+    catchErrors(async (req, res, next) => {
+    res.status(HTTP_STATUS.OK).json({
+        success: true,
         server_response: 'Welcome to MERN API',
     });
-});
+}));
+
+app.use('/api/v1/auth', authRoutes);
+
+app.use(errorHandler);
+
 
 // Your existing app.listen code
 app.listen(port, async () => {
