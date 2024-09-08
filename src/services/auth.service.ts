@@ -1,9 +1,10 @@
+import { jwtRefreshSecretKey, jwtSecretKey } from "../constants/env";
 import VerificationCodeType from "../constants/verificateCodetypes";
 import SessionModel from "../models/session.model";
 import UserModel from "../models/user.model";
 import VerificationCodeModel from "../models/verificationCode.model";
 import { oneYearFromNow } from "../utils/date";
-import { signToken } from "../utils/jwt";
+import jwt from "jsonwebtoken"
 
 export type CreateAccountParams = {
     email: string,
@@ -39,7 +40,27 @@ export const createAccount = async (data:CreateAccountParams) => {
 
     //sign access & refresh token
 
-    const refreshToken = signToken(session._id)
+    const refreshToken = jwt.sign(
+        { sessionId: session._id},
+        jwtRefreshSecretKey,{
+            audience: ['user'],
+            expiresIn: "30d"
+        }   
+    )
+    const accessToken = jwt.sign(
+        { userId: user._id,
+        sessionId: session._id},
+        jwtSecretKey,{
+            audience: ['user'],
+            expiresIn: "30d"
+        }   
+    )
+    return {
+        user,
+        refreshToken,
+        accessToken
+    }
+
 
     //return user & tokens
 
