@@ -1,19 +1,9 @@
 import { HTTP_STATUS } from "../constants/http";
-import { createAccount } from "../services/auth.service";
+import { createAccount, loginAccount } from "../services/auth.service";
 import catchErrors from "../utils/catchErrors";
 import { z } from "zod";
+import { loginSchema, registerSchema } from "../schemas/auth.schema";
 import { setAuthCookies } from "../utils/cookies";
-
-const registerSchema = z.object({
-    email: z.string().email().min(5).max(255),
-    password: z.string().min(8).max(255),
-    confirmPassword: z.string().min(8).max(255),
-    userAgent: z.string().optional(),
-}).refine((data) => {
-    return data.password === data.confirmPassword;
-}, { message: "Passwords don't match",
-    path: ["confirmPassword"],
- });
 
 
 export const registerHandler = catchErrors(async (req, res) => {
@@ -22,14 +12,21 @@ export const registerHandler = catchErrors(async (req, res) => {
         ...req.body,
         userAgent: req.headers['user-agent']});
         
-        // const user = await User.create({
-        //     email: request.email,
-        //     password: request.password,
-        // });
+    const {user, accessToken ,refreshToken} = await createAccount(request)
 
-        const {user, accessToken ,refreshToken} = await createAccount(request)
-
-        return setAuthCookies({
-            res,accessToken,refreshToken
-        }).status(HTTP_STATUS.CREATED).json(user)
+    return setAuthCookies({
+        res,accessToken,refreshToken
+    }).status(HTTP_STATUS.CREATED).json(user)
 });
+
+export const LoginHandler = catchErrors(async (req, res) => {
+    const request = loginSchema.parse({
+        ...req.body,
+        userAgent: req.headers['user-agent']});
+
+    const {user,accessToken, refreshToken} = await loginAccount(request)
+
+    return setAuthCookies({
+        res,accessToken,refreshToken
+    }).status(HTTP_STATUS.ACCEPTED).json(user)
+    })

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { comparePassword, hashValue } from "../utils/bcrypt";
+import { compareValue, hashValue } from "../utils/bcrypt";
 
 
 export interface UserDocument extends mongoose.Document {
@@ -8,12 +8,14 @@ export interface UserDocument extends mongoose.Document {
     verified: boolean;
     createdAt: Date;
     updatedAt: Date;
+    comparePassword(val: string): Promise<boolean>;
+    omitPassword(): Pick<UserDocument, "_id" | "email" | "verified" | "createdAt" | "updatedAt" | "__v">;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>({
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    verified: { type: Boolean, required: false }
+    verified: { type: Boolean, required: true, default: false },
 }, {
     timestamps: true
 });
@@ -28,7 +30,13 @@ userSchema.pre("save", async function (next) {
 })
 
 userSchema.methods.comparePassword = async function (val: string) {
-    return comparePassword(val, this.password)
+    return compareValue(val, this.password)
+}
+
+userSchema.methods.omitPassword = function () {
+    const user = this.toObject()
+    delete user.password
+    return user
 }
 
 const UserModel = mongoose.model<UserDocument>('User', userSchema);
