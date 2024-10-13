@@ -2,6 +2,7 @@ import { ErrorRequestHandler, Response } from "express";
 import { HTTP_STATUS } from "../constants/http";
 import { z } from "zod";
 import AppError from "../utils/AppError";
+import { REFRESH_PATH, clearAuthCookies } from "../utils/cookies";
 
 const handleZodError = (res:Response, error:z.ZodError) => {
     const errors = error.issues.map((err) => ({
@@ -14,30 +15,29 @@ const handleZodError = (res:Response, error:z.ZodError) => {
     });
 }
 
-const handleApperror = (res:Response, error:AppError) => {
+const handleAppError = (res: Response, error: AppError) => {
     return res.status(error.statusCode).json({
-        message: error.message,
-        errorCode: error.errorCode,
+      message: error.message,
+      errorCode: error.errorCode,
     });
-}
+  };  
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    console.log(`PATH: ${req.path}`, err);
-
-    if (err instanceof z.ZodError) {
-        return handleZodError(res, err);
+  const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+    console.log(`PATH ${req.path}`, error);
+  
+    if (req.path === REFRESH_PATH) {
+      clearAuthCookies(res);
     }
-
-    if (err instanceof AppError) {
-        return res.status(err.statusCode).json({
-            message: err.message,
-            errorCode: err.errorCode,
-        });
+  
+    if (error instanceof z.ZodError) {
+      return handleZodError(res, error);
     }
-    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        server_response: 'Something went wrong',
-    });
-}
-
-export default errorHandler;
+  
+    if (error instanceof AppError) {
+      return handleAppError(res, error);
+    }
+  
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal server error");
+  };
+  
+  export default errorHandler;

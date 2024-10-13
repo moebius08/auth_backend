@@ -24,3 +24,4 @@ const getEnv = (key: string, defaultValue?: string): string => {
   export const dbName = getEnv('DB_NAME');
   export const port = getEnv('PORT');
   export const APP_ORIGIN = getEnv('APP_ORIGIN');
+  export const RESEND_API_KEY = getEnv('RESEND_API_KEY');

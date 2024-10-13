@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const emailValidation = z.string().email().min(5).max(255)
+export const emailValidation = z.string().email().min(5).max(255)
 const passValidation = z.string().min(8).max(255)
 const userAgentValidation = z.string().optional()
 
@@ -19,4 +19,9 @@ export const registerSchema = loginSchema.extend({
     path: ["confirmPassword"],
  });
 
+ export const verificationCodeSchema = z.string().min(1).max(24);
 
+ export const resetPasswordSchema = z.object({
+   password: passValidation,
+   verificationCode: verificationCodeSchema,
+ });
