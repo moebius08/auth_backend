@@ -73,7 +73,7 @@ export const loginAccount = async ({email,userAgent}:LoginAccountParams) => {
 
     appAssert(user, HTTP_STATUS.NOT_FOUND, "Invalid Email or Password")
 
-    const isValid = user.comparePassword(password)
+    const isValid = await user.comparePassword(password)
 
     appAssert(isValid, HTTP_STATUS.FORBIDDEN, "Invalid Email or Password")
 
