@@ -1,4 +1,4 @@
-import { APP_ORIGIN, password } from "../constants/env";
+import { APP_ORIGIN } from "../constants/env";
 import SessionModel from "../models/session.model";
 import UserModel from "../models/user.model";
 import appAssert from "../utils/appAssert";
@@ -68,7 +68,7 @@ export type LoginAccountParams = {
 
 }
 
-export const loginAccount = async ({email,userAgent}:LoginAccountParams) => {
+export const loginAccount = async ({email,userAgent,password}:LoginAccountParams) => {
     const user = await UserModel.findOne({email})
 
     appAssert(user, HTTP_STATUS.NOT_FOUND, "Invalid Email or Password")
