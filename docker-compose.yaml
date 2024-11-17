@@ -9,16 +9,26 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MONGO_URL=mongodb://mongo:27017/mydatabase
-    depends_on:
-      - mongo
-
+      - MONGO_URL=mongodb://localhost:27017/mydatabase 
+    networks:
+      - app-network
+    volumes:
+      - app:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+  
   mongo:
-    image: mongo:latest
+    image: mongo
     ports:
       - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    volumes:  
+      - app:/data/db  
+
+    
 
 volumes:
-  mongo-data:
+  mongo:
+  app:
+  node_modules:
+
+networks:
+  app-network:

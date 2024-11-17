@@ -7,8 +7,8 @@ WORKDIR /usr/src/app
 # Copy both package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (including devDependencies)
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5000
 
 # Define the command to run the app
-CMD ["node", "app.js"]
+CMD ["npm", "run", "dev"]
