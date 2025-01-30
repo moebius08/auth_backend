@@ -2,32 +2,29 @@ version: '3'
 
 services:
   app:
-    build:
-      context: .
+    build: .
+    command: sh -c "npm install && npm run dev"
     volumes:
       - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
     ports:
       - "5000:5000"
-    environment:
-      - MONGO_URL=mongodb://localhost:27017/mydatabase 
+    env_file:
+      - ./.env
     networks:
       - app-network
-    volumes:
-      - app:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
-  
+
   mongo:
     image: mongo
     ports:
       - "27017:27017"
     volumes:  
-      - app:/data/db  
-
-    
+      - mongo:/data/db
+    networks:
+      - app-network
 
 volumes:
   mongo:
-  app:
   node_modules:
 
 networks:
