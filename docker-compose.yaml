@@ -11,21 +11,21 @@ services:
       - "5000:5000"
     env_file:
       - ./.env
-    networks:
-      - app-network
+    # networks:
+    #   - app-network
 
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:  
-      - mongo:/data/db
-    networks:
-      - app-network
+  # mongo:
+  #   image: mongo
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:  
+  #     - mongo:/data/db
+  #   networks:
+  #     - app-network
 
 volumes:
-  mongo:
+  # mongo:
   node_modules:
 
-networks:
-  app-network:
+# networks:
+#   app-network:
